@@ -1,5 +1,20 @@
 package com.supersection.p2p.controllers;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.apache.commons.io.IOUtils;
+
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -7,14 +22,6 @@ import com.sun.net.httpserver.HttpServer;
 import com.supersection.p2p.services.FileSharer;
 import com.supersection.p2p.utils.Multiparser;
 import com.supersection.p2p.utils.ParseResult;
-import org.apache.commons.io.IOUtils;
-
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FileController {
 
@@ -140,7 +147,7 @@ public class FileController {
                     outputStream.write(jsonResponse.getBytes());
                 }
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 System.err.println("Error processing file upload: " + e.getMessage());
                 String response = "Server error: " + e.getMessage();
                 exchange.sendResponseHeaders(500, response.getBytes().length);
@@ -175,7 +182,7 @@ public class FileController {
 
                 try (Socket socket = new Socket("localhost", port)) {
                     InputStream socketInput = socket.getInputStream();
-                    
+
                     File tempFile = File.createTempFile("download-", ".tmp");
                     String filename = "download-file";
 
